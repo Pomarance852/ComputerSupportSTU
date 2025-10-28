@@ -1,0 +1,133 @@
+---
+title: "Task1"
+author: "Michal Hupka"
+date: "28/10/2025"
+format:
+  html:
+    embed-resources: true
+editor: source
+
+##############################################
+# Mini Universe: The Town of Pezinok, Slovakia
+##############################################
+
+### 1.1 Atomic Types ----
+
+# Numeric variables
+population_density <- 780.5     # people per km^2
+average_income <- 1250.75       # EUR per month
+avg_temperature <- 10.8         # °C
+area_size <- 72.56              # km^2
+
+# Integer variables
+number_of_wineries <- 25
+number_of_parks <- 8
+number_of_schools <- 12
+
+# Logical variables
+has_castle <- TRUE
+is_capital_city <- FALSE
+
+# Character variables
+town_name <- "Pezinok"
+region <- "Bratislava Region"
+category <- "Wine-producing town"
+
+# Description in one sentence
+cat(paste(
+  "The town of", town_name, "is a", category, "located in the",
+  region, "with", number_of_wineries, "wineries and",
+  population_density, "people per km².\n"
+))
+
+### 1.2 Vectors ----
+
+# 1. Numeric vector combining numeric + integer variables
+numeric_vector <- c(population_density, average_income, avg_temperature,
+                    area_size, number_of_wineries, number_of_parks, number_of_schools)
+print(numeric_vector)
+
+# 2. Sequence vector from 20 to 100 with step of 8
+seq_vector <- seq(20, 100, by = 8)
+print(seq_vector)
+
+# 3. Logical vector of 10 random TRUE/FALSE values
+set.seed(123) # for reproducibility
+logic_vector <- sample(c(TRUE, FALSE), 10, replace = TRUE)
+print(logic_vector)
+
+### 1.3 Matrix ----
+
+# Create 3×3 matrix with random numbers between -50 and 50
+set.seed(321)
+town_matrix <- matrix(sample(-50:50, 9, replace = TRUE), nrow = 3, ncol = 3)
+
+# Name rows and columns
+rownames(town_matrix) <- c("Center", "Suburbs", "Countryside")
+colnames(town_matrix) <- c("Economy", "Environment", "Culture")
+
+print(town_matrix)
+
+# Calculate row and column averages
+row_means <- rowMeans(town_matrix)
+col_means <- colMeans(town_matrix)
+
+cat("\nRow means:\n")
+print(row_means)
+
+cat("\nColumn means:\n")
+print(col_means)
+
+### 1.4 List ----
+
+# Create a list combining all previous objects
+pezinok_list <- list(
+  numeric_values = list(population_density, average_income, avg_temperature, area_size),
+  integer_values = list(number_of_wineries, number_of_parks, number_of_schools),
+  logical_values = list(has_castle, is_capital_city),
+  character_values = list(town_name, region, category),
+  numeric_vector = numeric_vector,
+  seq_vector = seq_vector,
+  logic_vector = logic_vector,
+  matrix = town_matrix,
+  description = "Pezinok is a picturesque Slovak town known for its wine culture and proximity to the Little Carpathians."
+)
+
+print(pezinok_list$description)
+
+### 1.5 Factor ----
+
+# Factor representing wealth levels in different neighborhoods
+neighborhood_wealth <- factor(
+  c("medium", "high", "low", "medium", "high", "low"),
+  levels = c("low", "medium", "high"),
+  ordered = TRUE
+)
+
+print(neighborhood_wealth)
+table(neighborhood_wealth)
+
+### 1.6 Data Frame ----
+
+# Create data frame for Pezinok’s main wineries
+wineries_df <- data.frame(
+  Name = c("Víno Matyšák", "Karpatská Perla", "Repa Winery", "Pivnica Radošina", "Zámocké Vinárstvo", "Vinohradníctvo Miroslav Dudo"),
+  Annual_Production = c(120000, 95000, 70000, 55000, 40000, 30000),  # in liters
+  Organic = c(TRUE, FALSE, TRUE, FALSE, TRUE, FALSE),
+  Quality_Level = c("high", "high", "medium", "medium", "medium", "low")
+)
+
+# Rename columns
+colnames(wineries_df) <- c("Winery_Name", "Liters_Produced", "Is_Organic", "Quality")
+
+# Display structure and summary
+str(wineries_df)
+summary(wineries_df)
+
+# Add new derived column: production category based on output
+wineries_df$Production_Category <- ifelse(
+  wineries_df$Liters_Produced > 80000, "Large",
+  ifelse(wineries_df$Liters_Produced > 50000, "Medium", "Small")
+)
+
+print(wineries_df)
