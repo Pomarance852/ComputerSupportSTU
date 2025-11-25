@@ -1,0 +1,178 @@
+
+##############################################
+# Mini Universe: The Town of Pezinok, Slovakia
+##############################################
+
+### 1.1 Atomic Types ----
+population_density <- 780.5     # people per km^2
+average_income <- 1250.75       # EUR per month
+avg_temperature <- 10.8         # °C
+area_size <- 72.56              # km^2
+
+number_of_wineries <- 25
+number_of_parks <- 8
+number_of_schools <- 12
+
+has_castle <- TRUE
+is_capital_city <- FALSE
+
+town_name <- "Pezinok"
+region <- "Bratislava Region"
+category <- "Wine-producing town"
+
+cat(paste(
+  "The town of", town_name, "is a", category, "located in the",
+  region, "with", number_of_wineries, "wineries and",
+  population_density, "people per km².\n"
+))
+
+### 1.2 Vectors ----
+numeric_vector <- c(population_density, average_income, avg_temperature,
+                    area_size, number_of_wineries, number_of_parks, number_of_schools)
+print(numeric_vector)
+
+seq_vector <- seq(20, 100, by = 8)
+print(seq_vector)
+
+set.seed(123)
+logic_vector <- sample(c(TRUE, FALSE), 10, replace = TRUE)
+print(logic_vector)
+
+### 1.3 Matrix ----
+set.seed(321)
+town_matrix <- matrix(sample(-50:50, 9, replace = TRUE), nrow = 3, ncol = 3)
+rownames(town_matrix) <- c("Center", "Suburbs", "Countryside")
+colnames(town_matrix) <- c("Economy", "Environment", "Culture")
+print(town_matrix)
+
+row_means <- rowMeans(town_matrix)
+col_means <- colMeans(town_matrix)
+print(row_means)
+print(col_means)
+
+### 1.4 List ----
+pezinok_list <- list(
+  numeric_values = list(population_density, average_income, avg_temperature, area_size),
+  integer_values = list(number_of_wineries, number_of_parks, number_of_schools),
+  logical_values = list(has_castle, is_capital_city),
+  character_values = list(town_name, region, category),
+  numeric_vector = numeric_vector,
+  seq_vector = seq_vector,
+  logic_vector = logic_vector,
+  matrix = town_matrix,
+  description = "Pezinok is a picturesque Slovak town known for its wine culture and proximity to the Little Carpathians."
+)
+print(pezinok_list$description)
+
+### 1.5 Factor ----
+neighborhood_wealth <- factor(
+  c("medium", "high", "low", "medium", "high", "low"),
+  levels = c("low", "medium", "high"),
+  ordered = TRUE
+)
+print(neighborhood_wealth)
+table(neighborhood_wealth)
+
+### 1.6 Data Frame ----
+wineries_df <- data.frame(
+  Winery_Name = c("Víno Matyšák", "Karpatská Perla", "Repa Winery", "Pivnica Radošina", "Zámocké Vinárstvo", "Vinohradníctvo Miroslav Dudo"),
+  Liters_Produced = c(120000, 95000, 70000, 55000, 40000, 30000),
+  Is_Organic = c(TRUE, FALSE, TRUE, FALSE, TRUE, FALSE),
+  Quality = c("high", "high", "medium", "medium", "medium", "low")
+)
+wineries_df$Production_Category <- ifelse(
+  wineries_df$Liters_Produced > 80000, "Large",
+  ifelse(wineries_df$Liters_Produced > 50000, "Medium", "Small")
+)
+print(wineries_df)
+
+###############################################################
+# TASK 2 – Subsetting & Missing Data
+###############################################################
+seq_vector[3]
+seq_vector[2:5]
+seq_vector[seq_vector > 40]
+
+logic_vector[logic_vector]
+which(logic_vector)
+
+pezinok_list$description
+pezinok_list[["matrix"]]
+pezinok_list[["numeric_vector"]][2]
+
+head(wineries_df, 3)
+wineries_df[4, 1]
+wineries_df$Is_Organic
+
+df_subset <- wineries_df[wineries_df$Is_Organic == TRUE, ]
+df_subset
+
+df_subset_2 <- wineries_df[wineries_df$Quality %in% c("high", "medium"), ]
+df_subset_2
+
+df_corrupted <- wineries_df
+df_corrupted[2, "Is_Organic"] <- NA
+df_corrupted[5, "Quality"] <- NA
+df_corrupted[6, "Liters_Produced"] <- NA
+
+sum(is.na(df_corrupted))
+colSums(is.na(df_corrupted))
+mean(df_corrupted$Liters_Produced, na.rm = TRUE)
+
+df_clean <- na.omit(df_corrupted)
+df_clean
+
+max_index <- which.max(wineries_df$Liters_Produced)
+wineries_df[max_index, ]
+
+min_index <- which.min(wineries_df$Liters_Produced)
+wineries_df[min_index, ]
+
+###############################################################
+# TASK 3 – Real Data Analysis
+###############################################################
+# Install packages only once (run manually if needed):
+# install.packages(c("dplyr", "readxl"))
+
+library(dplyr)
+library(readxl)
+
+# Load dataset
+my_real_data <- read_excel("to.xlsx")
+
+# Inspect data
+glimpse(my_real_data)
+head(my_real_data)
+summary(my_real_data)
+
+# Question 1: Top 5 cities by population
+my_real_data %>%
+  select(city, population) %>%
+  arrange(desc(population)) %>%
+  head(5)
+
+# Question 2: Average lat/lng by region
+my_real_data %>%
+  group_by(admin_name) %>%
+  summarise(
+    avg_lat = mean(lat, na.rm = TRUE),
+    avg_lng = mean(lng, na.rm = TRUE),
+    count = n()
+  )
+
+# Question 3: Cities with missing population
+my_real_data %>%
+  filter(is.na(population)) %>%
+  select(city, admin_name, population)
+
+# Question 4: Distance from equator
+my_real_data %>%
+  mutate(distance_from_equator = abs(lat)) %>%
+  select(city, lat, distance_from_equator) %>%
+  arrange(distance_from_equator)
+
+# Question 5: Regions with most cities
+my_real_data %>%
+  group_by(admin_name) %>%
+  summarise(number_of_cities = n()) %>%
+  arrange(desc(number_of_cities))
