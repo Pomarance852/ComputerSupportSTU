@@ -1,0 +1,91 @@
+---
+title: "Task 4"
+author: "Michal Hupka"
+format: html
+editor: visual
+---
+
+```{r}
+# Task 4 – Toolkit funkcií pre analýzu vesmíru
+
+
+suppressPackageStartupMessages({
+  library(readr)
+  library(dplyr)
+  library(rlang)
+})
+
+
+# 4.1. "Greeting"
+
+welcome_to_my_universe <- function(your_name, universe_name = "Môj Vesmír") {
+  cat("=============================================\n")
+  cat("   Analytický Toolkit pre:", universe_name, "\n")
+  cat("   Report pripravil:", your_name, "\n")
+  cat("=============================================\n\n")
+}
+
+
+welcome_to_my_universe("Michal", universe_name = "Pezinok")
+
+# 4.2. "Loading"
+
+load_and_inspect <- function(file_path) {
+  data <- read_csv(file_path, show_col_types = FALSE)
+  cat("--- Data Loaded:", file_path, "---\n")
+  print(glimpse(data))
+  cat("\n--- First 6 Rows: ---\n")
+  print(head(data))
+  return(data)
+}
+
+
+filter_by_category <- function(data, column, value) {
+  data %>%
+    filter({{ column }} == value)
+}
+
+# B) Filter podľa prahu (napr. population > 1 000 000)
+filter_by_threshold <- function(data, column, threshold) {
+  data %>%
+    filter({{ column }} > threshold)
+}
+
+compute_ratio <- function(data, numerator, denominator, new_col = "ratio") {
+  data %>%
+    filter(!is.na({{ numerator }}), !is.na({{ denominator }}), {{ denominator }} != 0) %>%
+    mutate("{new_col}" := {{ numerator }} / {{ denominator }})
+}
+
+generate_report <- function(data, category_col, category_value, metrics) {
+  # Vyfiltrovaná podmnožina
+  subset_df <- data %>% filter({{ category_col }} == category_value)
+
+  cat("------------------------------------------------------------\n")
+  cat("REPORT pre kategóriu:", as.character(category_value), "\n")
+  cat("Počet záznamov:", nrow(subset_df), "\n")
+
+  for (m in metrics) {
+    if (!m %in% names(subset_df)) {
+      cat("\n- Metrika:", m, "\n")
+      next
+    }
+    vec <- subset_df[[m]]
+    if (!is.numeric(vec)) {
+      cat("\n- Metrika:", m, "/n")
+      next
+    }
+    cat("\n- Metrika:", m, "\n")
+    cat("  Dostupné hodnoty (n):", sum(!is.na(vec)), "\n")
+    cat("  Priemer:", round(mean(vec, na.rm = TRUE), 2), "\n")
+    cat("  Medián:", round(median(vec, na.rm = TRUE), 2), "\n")
+    cat("  Minimum:", suppressWarnings(min(vec, na.rm = TRUE)), "\n")
+    cat("  Maximum:", suppressWarnings(max(vec, na.rm = TRUE)), "\n")
+  }
+
+  cat("------------------------------------------------------------\n\n")
+  invisible(subset_df)
+}
+
+```
+
