@@ -1,0 +1,106 @@
+---
+title: "task5"
+author: "Michal Hupka"
+format: html
+editor: visual
+---
+
+```{r}
+###############################################################
+# Task 5 – Visualising Your Universe (Base R & ggplot2)
+# Dataset: Cities of Tonga (from Task 3)
+###############################################################
+
+
+library(readxl)
+library(dplyr)
+library(ggplot2)
+
+
+my_data <- read_excel("to.xlsx")
+
+required_cols <- c("city","population","admin_name","lat","lng")
+missing <- setdiff(required_cols, colnames(my_data))
+if (length(missing) > 0) {
+  stop(paste("Chýbajúce stĺpce v to.xlsx:", paste(missing, collapse = ", ")))
+}
+
+
+data_num <- my_data %>%
+  filter(!is.na(population), !is.na(lat), !is.na(lng))
+
+
+# 5.1 – The Quick Sketch (Base R Histogram) -------------------
+
+pop_vec <- my_data$population[!is.na(my_data$population)]
+
+hist(
+  pop_vec,
+  main = "Distribúcia populácie miest v Tongě",
+  xlab = "Populácia (počet obyvateľov)",
+  col = "lightblue",
+  border = "white"
+)
+
+
+# 5.2 – The Relationship Map (ggplot2 Scatter Plot) ----------
+
+p_scatter <- ggplot(data = data_num, aes(x = lng, y = lat, color = admin_name)) +
+  geom_point(alpha = 0.7, size = 2.8) +
+  geom_smooth(method = "loess", color = "gray25", se = TRUE) +
+  labs(
+    title = "Priestorové rozloženie miest: zemepisná dĺžka vs. šírka",
+    subtitle = "Farba podľa administratívneho regiónu",
+    x = "Zemepisná dĺžka (°)",
+    y = "Zemepisná šírka (°)",
+    color = "Región"
+  ) +
+  theme_minimal()
+
+print(p_scatter)
+
+
+# 5.3 – The Comparison (ggplot2 Boxplot) ----------------------
+
+p_box <- ggplot(
+  data = my_data %>% filter(!is.na(population), !is.na(admin_name)),
+  aes(x = admin_name, y = population, fill = admin_name)
+) +
+  geom_boxplot(outlier.alpha = 0.6) +
+  labs(
+    title = "Porovnanie populácie podľa administratívneho regiónu",
+    x = "Administratívny región",
+    y = "Populácia (počet obyvateľov)"
+  ) +
+  theme_light() +
+  theme(legend.position = "none") +
+  coord_flip()  # (voliteľné) lepšia čitateľnosť, ak je veľa regiónov
+
+print(p_box)
+
+
+# 5.4 – The “Deep Dive” (Faceting alebo vlastný plot) --------
+
+p_facet_hist <- ggplot(
+  data = my_data %>% filter(!is.na(population), !is.na(admin_name)),
+  aes(x = population)
+) +
+  geom_histogram(bins = 15, fill = "coral", color = "black") +
+  facet_wrap(~ admin_name) +
+  labs(
+    title = "Distribúcia populácie naprieč regiónmi",
+    x = "Populácia (počet obyvateľov)",
+    y = "Počet miest"
+  ) +
+  theme_bw()
+
+print(p_facet_hist)
+
+
+# 5.5 – Final Step: Export (Saving Your Work) -----------------
+
+ggsave("my_universe_plot.png", plot = p_scatter, width = 8, height = 6, dpi = 300)
+
+```
+
+
